@@ -21,6 +21,17 @@ Just run the `qr-code-app` project and create your QR code with a nice UI.
 ./gradlew :qr-code-app:run
 ----
 
+https://www.jbang.dev/documentation/jbang-idea/latest/installation.html[jbang] can also be used to run the application:
+
+[source, bash]
+----
+jbang catalog add --name simonscholz https://github.com/SimonScholz/jbang-catalog/blob/main/jbang-catalog.json
+
+jbang trust add https://github.com/SimonScholz/qr-code-with-logo/releases/download/
+
+jbang qr-code-app@simonscholz
+----
+
 Or download the appropriate distribution from the https://github.com/SimonScholz/qr-code-with-logo/releases[releases section].
 
 More details about the application can be found https://github.com/SimonScholz/qr-code-with-logo#qr-code-app[here]
@@ -96,7 +107,7 @@ fun BufferedImage.toFile(file: File) {
 
 val qrCodeApi = createQrCodeApi()
 qrCodeApi.createQrImage(QrCodeConfig("https://simonscholz.dev/", DEFAULT_IMG_SIZE))
-    .toFile(File("qr-with-defaults-kotlin.png"))
+    .toFile(File("qr-with-defaults.png"))
 ----
 
 For more advanced examples, please have a look at the https://github.com/SimonScholz/qr-code-with-logo/blob/main/kotlin-sample/src/main/kotlin/io/github/simonscholz/Main.kt[`kotlin-sample` module].
@@ -152,9 +163,11 @@ because it adds the opportunity to make use of a SVG image as logo besides using
 
 [source, java]
 ----
-import io.github.simonscholz.svg.QrCodeSvgConfig;
+import io.github.simonscholz.qrcode.QrCodeConfig;
 import io.github.simonscholz.svg.QrCodeSvgFactory;
+import org.w3c.dom.Document;
 
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -163,12 +176,12 @@ import java.io.File;
 
 public class SVGSamples {
     public static void main(final String[] args) throws TransformerException {
-        var qrCodeConfig = new QrCodeSvgConfig.Builder("https://simonscholz.dev/}").build();
-        var qrCodeDocument = QrCodeSvgFactory.createQrCodeApi().createQrCodeSvg(qrCodeConfig);
-        var transformerFactory = TransformerFactory.newInstance();
-        var transformer = transformerFactory.newTransformer();
-        var source = new DOMSource(qrCodeDocument);
-        var result = new StreamResult(new File("qr-code.svg"));
+        QrCodeConfig qrCodeConfig = new QrCodeConfig.Builder("https://simonscholz.dev/").build();
+        Document qrCodeDocument = QrCodeSvgFactory.createQrCodeApi().createQrCodeSvg(qrCodeConfig);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource source = new DOMSource(qrCodeDocument);
+        StreamResult result = new StreamResult(new File("qr-code.svg"));
         transformer.transform(source, result);
     }
 }
@@ -178,7 +191,7 @@ public class SVGSamples {
 
 [source, kotlin]
 ----
-import io.github.simonscholz.svg.QrCodeSvgConfig
+import io.github.simonscholz.qrcode.QrCodeConfig
 import io.github.simonscholz.svg.QrCodeSvgFactory
 import org.w3c.dom.Document
 import java.io.File
@@ -187,7 +200,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 fun main() {
-    val svgConfig = QrCodeSvgConfig.Builder("https://simonscholz.dev/").build()
+    val svgConfig = QrCodeConfig.Builder("https://simonscholz.dev/").build()
     val qrCodeSvg = QrCodeSvgFactory.createQrCodeApi().createQrCodeSvg(svgConfig)
     qrCodeSvg.toFile(File("svg-qr-code.svg"))
 }
@@ -277,6 +290,10 @@ Predefined dot shapes of the library:
 - `QrCodeDotShape.DIAMOND`
 - `QrCodeDotShape.CROSS`
 - `QrCodeDotShape.SMILEY`
+- `QrCodeDotShape.FLOWER`
+- `QrCodeDotShape.FLOWER_2`
+- `QrCodeDotShape.FLOWER_3`
+- `QrCodeDotShape.EASTER_EGG`
 
 The app and samples show how to use these predefined dot shapes or create your own dot shapes.
 
@@ -381,6 +398,8 @@ String email = SimpleTypes.email("simon@example.com", "Hello World", "This is a 
 String phoneNumber = SimpleTypes.phoneNumber("+49 176 12345678");
 
 String sms = SimpleTypes.sms("+49 176 12345678", "Hello, this is a test SMS");
+
+String wifi = SimpleTypes.wifi("My-Wifi", "MyWifiPassword");
 ```
 
 These String values can be used to create a QR code.
@@ -407,6 +426,10 @@ image::./docs/types/simple-phoneNumber.png[]
 Simple sms:
 
 image::./docs/types/simple-sms.png[]
+
+Simple wifi:
+
+image::./docs/types/simple-wifi.png[]
 ====
 
 ==== More complex types

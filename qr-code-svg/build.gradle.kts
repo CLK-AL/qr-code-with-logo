@@ -1,5 +1,4 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import com.vanniktech.maven.publish.SonatypeHost
 import io.gitlab.arturbosch.detekt.Detekt
 
 plugins {
@@ -73,7 +72,6 @@ tasks.withType<Detekt>().configureEach {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.S01)
-
+    publishToMavenCentral()
     signAllPublications()
 }
